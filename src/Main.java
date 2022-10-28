@@ -20,6 +20,10 @@ public class Main {
 
             usarDatabase(con);
 
+            borrarTabla(con,"Compras");
+            borrarTabla(con,"Player");
+            borrarTabla(con,"Games");
+
 
             crearTabla(con, "CREATE TABLE IF NOT EXISTS Player" + "(ID_Player INTEGER AUTO_INCREMENT," + "Nick VARCHAR(45)," +
                     "password VARCHAR(128),"+ "email VARCHAR(100)," + "PRIMARY KEY (ID_Player))");
@@ -33,9 +37,11 @@ public class Main {
                     + "PRIMARY KEY (ID_Compra)," + "FOREIGN KEY (ID_Player) REFERENCES Player(ID_Player)," +"FOREIGN KEY (ID_Games) REFERENCES Games(ID_Games))" );
 
 
-          //  insertarDatos(con, new File("Player.sql"));
-          //  insertarDatos(con, new File("Games.sql"));
+            insertarDatos(con, new File("Player.sql"));
+            insertarDatos(con, new File("Games.sql"));
             insertarDatos(con, new File("Compras.sql"));
+
+
             // addColum(con);
             // insertarDato(con);
             // Ejercicio1: "Select * FROM  DPerea ORDER BY edad"
