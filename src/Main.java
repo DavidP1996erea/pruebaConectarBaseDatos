@@ -1,4 +1,10 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.net.ConnectException;
 import java.sql.*;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -7,18 +13,34 @@ public class Main {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String conexionURL = "jdbc:mysql://dns11036.phdns11.es?"
-                    + "user=ad2223&password=nervion";
+                    + "user=DPerea&password=DPerea";
             Connection con = DriverManager.getConnection(conexionURL);
             System.out.println(con.toString());
 
 
             usarDatabase(con);
-            // crearTabla(con);
+
+
+            crearTabla(con, "CREATE TABLE IF NOT EXISTS Player" + "(ID_Player INTEGER AUTO_INCREMENT," + "Nick VARCHAR(45)," +
+                    "password VARCHAR(128),"+ "email VARCHAR(100)," + "PRIMARY KEY (ID_Player))");
+
+            crearTabla(con, "CREATE TABLE IF NOT EXISTS Games" + "(ID_Games INTEGER AUTO_INCREMENT," + "nombre VARCHAR(45)," +
+                    "tiempoJugado TIME," + "PRIMARY KEY (ID_Games))");
+
+
+           crearTabla(con, "CREATE TABLE IF NOT EXISTS Compras" + "(ID_Compra INTEGER AUTO_INCREMENT," + "ID_Player INTEGER," +
+                    "ID_Games INTEGER,"+ "cosa VARCHAR(25)," +"precio DECIMAL(6,2),"+ "fechaCompra DATE,"
+                    + "PRIMARY KEY (ID_Compra)," + "FOREIGN KEY (ID_Player) REFERENCES Player(ID_Player)," +"FOREIGN KEY (ID_Games) REFERENCES Games(ID_Games))" );
+
+
+          //  insertarDatos(con, new File("Player.sql"));
+          //  insertarDatos(con, new File("Games.sql"));
+            insertarDatos(con, new File("Compras.sql"));
             // addColum(con);
             // insertarDato(con);
-            //Ejercicio1: "Select * FROM  DPerea ORDER BY edad"
-            // Ejercicio2: "Select david, apellido from DPerea ORDER BY apellido"
-            // Ejercicio3: "Select david, apellido from DPerea where edad>30"
+            // Ejercicio1: "Select * FROM  DPerea ORDER BY edad"
+            // Ejercicio2: "Select nombre, apellido from DPerea ORDER BY apellido"
+            // Ejercicio3: "Select nombre, apellido from DPerea where edad>30"
             // Ejercicio4: "Select david from DPerea where david like 'J%' ORDER BY apellido"
             // Ejercicio5: "Select david from DPerea where david like 'C%' AND apellido like 'A%' ORDER BY edad desc"
             // Ejercicio6: "Select AVG(edad) AS 'Edad media' from DPerea"
@@ -26,7 +48,7 @@ public class Main {
             // Ejercicio8: "SELECT * FROM DPerea WHERE EDAD BETWEEN 24 AND 32"
             // Ejercicio9: "Select * from DPerea where edad >65"
             // Ejercicio10: addColum()
-              mostrarDatos(con,"UPDATE DPerea set laboral = estudiantes where edad<18 ") ;
+            // mostrarDatos(con,"UPDATE DPerea set laboral = estudiantes where edad<18 ") ;
 
 
         } catch (ClassNotFoundException e) {
@@ -38,6 +60,7 @@ public class Main {
     }
 
 
+
     public static void usarDatabase(Connection con) {
 
         Statement smtl = null;
@@ -45,7 +68,7 @@ public class Main {
             smtl = con.createStatement();
 
 
-            String usarTabla = "USE ad2223";
+            String usarTabla = "USE ad2223_DPerea";
 
             smtl.executeUpdate(usarTabla);
         } catch (SQLException e) {
@@ -54,19 +77,28 @@ public class Main {
 
     }
 
-    public static void crearTabla(Connection con) {
+    public static void crearTabla(Connection con, String crearTabla) {
         Statement smtl = null;
         try {
             smtl = con.createStatement();
-
-            String crearTabla = "CREATE OR ALTER TABLE DPerea" + "(ID INTEGER AUTO_INCREMENT," + "nombre VARCHAR(50)," + "apellido VARCHAR(50),"
-                    + "edad INTEGER," + "PRIMARY KEY (ID))";
 
             smtl.executeUpdate(crearTabla);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    public static void borrarTabla(Connection con, String nombreTabla){
+
+        Statement smtl = null;
+        try {
+            smtl = con.createStatement();
+
+            String borrarTabla ="DROP TABLE IF EXISTS "+ nombreTabla;
+            smtl.executeUpdate(borrarTabla);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -75,7 +107,7 @@ public class Main {
         try {
             smtl = con.createStatement();
 
-            String crearTabla = "ALTER TABLE DPerea Add laboral varchar(50) AFTER edad";
+            String crearTabla = "ALTER TABLE Personas Add laboral varchar(50) AFTER edad";
 
 
             smtl.executeUpdate(crearTabla);
@@ -93,955 +125,30 @@ public class Main {
 
 
 
-    public static void insertarDato(Connection con){
+    public static void insertarDatos(Connection con, File file){
+
 
         Statement smtl = null;
+        BufferedReader br=null;
+
         try {
             smtl = con.createStatement();
 
+            br = new BufferedReader(new FileReader(file));
+            Scanner sc = new Scanner(br);
+            String dato;
 
-            String [] insertarDatos={
-                    "insert into DPerea (david, apellido, edad) values ('Adèle', 'Algeo', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïca', 'Longbothom', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Sòng', 'Buttwell', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Néhémie', 'Bartosinski', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yénora', 'McLagan', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nuó', 'Immings', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Publicité', 'Langhorne', 23);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Personnalisée', 'Hartzogs', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Geneviève', 'Delbergue', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eugénie', 'Piggens', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clémentine', 'Erley', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dafnée', 'MacHostie', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Géraldine', 'Pedrocco', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kuí', 'Bosworth', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Annotée', 'Anney', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célestine', 'Hessenthaler', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Intéressant', 'Enderson', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëly', 'Gerraty', 14);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Åslög', 'Hassekl', 14);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-hélène', 'Lamerton', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Frédérique', 'Bruffell', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méryl', 'Gay', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Håkan', 'Farriar', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélia', 'MacGowan', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pò', 'Boame', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Garçon', 'Brissenden', 42);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tán', 'Paridge', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pål', 'Stubbert', 14);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zoé', 'LeEstut', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Médiamass', 'Shergold', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kallisté', 'Orr', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eliès', 'Defont', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Judicaël', 'Sivorn', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bénédicte', 'Rasher', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mégane', 'Petrazzi', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurène', 'Yashin', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélissandre', 'Claricoates', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Silverlock', 33);" ,
-                    "insert into DPerea (david, apellido, edad) values ('André', 'Garrison', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Valsler', 25);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Camélia', 'Daviddi', 30);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-noël', 'Rylands', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dà', 'Saunton', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andrée', 'Redman', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Judicaël', 'Fry', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Renée', 'Swynley', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Sòng', 'Dronsfield', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adélie', 'Abby', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tán', 'Oliphand', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dafnée', 'Lipman', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bécassine', 'Yeats', 17);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïté', 'Storks', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Joséphine', 'Mollen', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méryl', 'Andreotti', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yáo', 'Middell', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gösta', 'Dymoke', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérengère', 'Izhaky', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Renée', 'Lavelle', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Börje', 'Hales', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Audréanne', 'Butters', 45);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lóng', 'Kleehuhler', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tú', 'MacFadin', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérengère', 'Busfield', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Garçon', 'Howden', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léane', 'Antonignetti', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cunégonde', 'Christiensen', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Naëlle', 'Giacobilio', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adélaïde', 'Ericsson', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Styrbjörn', 'Moodey', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Fèi', 'Seldner', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kévina', 'Pinsent', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïwenn', 'Prettejohns', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Styrbjörn', 'Armfield', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Faîtes', 'Ingraham', 54);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Åsa', 'Battell', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clémentine', 'Fardoe', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Simplifiés', 'Tramel', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andrée', 'Poppleton', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tú', 'Paolucci', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marylène', 'Adamiec', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Erwéi', 'Cant', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lài', 'Danzig', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Erwéi', 'Jeyness', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adèle', 'Klich', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Uò', 'Pippard', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-noël', 'MacCall', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Simplifiés', 'Grant', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andrée', 'Kensitt', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Daphnée', 'Veschambes', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïlis', 'Andrin', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Valérie', 'Sporrij', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-thérèse', 'Segges', 54);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adélie', 'Merrell', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Rébecca', 'Backman', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gwenaëlle', 'Hairsnape', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gaëlle', 'Godlee', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Josée', 'Stocks', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lèi', 'Molloy', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-françoise', 'Chat', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Camélia', 'Doget', 43);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Burness', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gérald', 'Margerrison', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Märta', 'Hoogendorp', 64);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Illustrée', 'Rigardeau', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lài', 'Jodlowski', 91);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cloé', 'Vickarman', 91);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélinda', 'Billitteri', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adèle', 'Duxbarry', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Simplifiés', 'Lowson', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-ève', 'Matuszynski', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maï', 'Binks', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mén', 'Rickword', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léandre', 'Hasted', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Måns', 'Quilligan', 94);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mahélie', 'Alsop', 37);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Märta', 'Medlar', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Rébecca', 'Badrock', 33);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tú', 'Broz', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Åke', 'Coghlan', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andréanne', 'Durban', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nuó', 'Billett', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kuí', 'Cheeseman', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonie', 'Curnokk', 52);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélinda', 'Jude', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaïs', 'Havvock', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Simplifiés', 'McMennum', 94);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Séréna', 'Moultrie', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ophélie', 'Castillon', 43);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adélie', 'Wrate', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Réjane', 'Meneo', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Josée', 'Malyan', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Personnalisée', 'Strugnell', 66);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurélie', 'Metham', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Judicaël', 'Beidebeke', 66);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Salomé', 'Sanches', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïca', 'Curlis', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïlis', 'Sturton', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Håkan', 'Faveryear', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Séverine', 'Zannuto', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Renée', 'Fishe', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clémentine', 'Mitchell', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nadège', 'Annear', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gérald', 'Nutley', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adélaïde', 'Wanklin', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Thérèse', 'Steade', 93);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Görel', 'Bushaway', 99);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Audréanne', 'Lecointe', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nélie', 'Hartridge', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaël', 'Glader', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Alizée', 'Kidman', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonie', 'Shephard', 27);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gisèle', 'MacIntyre', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andréa', 'Robens', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Geneviève', 'Waylen', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Béatrice', 'Inglis', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Thérèsa', 'Barde', 67);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zoé', 'Dumper', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïca', 'Haddleston', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïs', 'Timmis', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Réjane', 'Andrioni', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cunégonde', 'Trainor', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Geneviève', 'Bankes', 66);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Táng', 'Rous', 13);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïly', 'Goulborn', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Amélie', 'Liffe', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mén', 'Argyle', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célestine', 'Kiffe', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Lightbourne', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Néhémie', 'Culvey', 58);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Stops', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélodie', 'Waitland', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Göran', 'Mingard', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Audréanne', 'Ship', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Angèle', 'Ambroz', 42);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gaëlle', 'Burcher', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pò', 'Liccardo', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Personnalisée', 'Gillam', 99);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gösta', 'Kirsch', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléopatre', 'Bleackley', 42);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nuó', 'Burges', 18);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-thérèse', 'Sproat', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Publicité', 'Pate', 17);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Desirée', 'Siddle', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gösta', 'Mateuszczyk', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léane', 'Walter', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zhì', 'Cuttell', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëline', 'Nealon', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dà', 'Chiswell', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Annotés', 'Hamelyn', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aí', 'Propper', 30);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Thérèsa', 'Walker', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Styrbjörn', 'Ashling', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïs', 'Bilyard', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Fèi', 'Steedman', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Vérane', 'Lancett', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mårten', 'Brussell', 93);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélanie', 'Corson', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gwenaëlle', 'Setterthwait', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pò', 'Ketteringham', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélia', 'Lineham', 71);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-josée', 'Tomadoni', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Séverine', 'Flode', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïly', 'Hay', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Réjane', 'Weaben', 29);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Vérane', 'Straker', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Médiamass', 'Brentnall', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëline', 'Curgenuer', 96);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nuó', 'Pattle', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kuí', 'O''Brogane', 37);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Athéna', 'MacAndie', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ruò', 'Kalkhoven', 14);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Sòng', 'Satchel', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Fèi', 'Rigmond', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Océane', 'Ruppeli', 12);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Erwéi', 'Risdale', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlle', 'Conyer', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léone', 'Abrahart', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cunégonde', 'Makinson', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cunégonde', 'Kermeen', 29);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mahélie', 'Kidde', 30);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dà', 'Clayton', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zoé', 'Perry', 13);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gwenaëlle', 'Robel', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lorène', 'Plunket', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Miléna', 'Clappison', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méng', 'Van den Hof', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kù', 'Sparhawk', 14);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélanie', 'Reinhardt', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aurélie', 'Knapman', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clémence', 'Hurch', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonie', 'Yurygyn', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andréanne', 'Chatres', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mylène', 'Burgis', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zhì', 'Letrange', 18);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Táng', 'Canet', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mégane', 'Pestridge', 18);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ráo', 'Flux', 30);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélanie', 'Astridge', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérénice', 'Sporle', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Esbjörn', 'Joddens', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Táng', 'Emmens', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eugénie', 'Vasyutkin', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Magdalène', 'Inglesent', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélys', 'Conelly', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Réservés', 'Vasechkin', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélanie', 'Lancett', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Camélia', 'Olenikov', 12);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Måns', 'Drysdall', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïlys', 'Hlavecek', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Östen', 'Rosin', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Jankowski', 17);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Liè', 'Swalough', 29);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léone', 'Dollin', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Rébecca', 'McCrorie', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Rattray', 71);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lài', 'Middle', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Wá', 'Byas', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Rébecca', 'Burburough', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïs', 'Shadrach', 83);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mahélie', 'Rundall', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dafnée', 'Filipychev', 41);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lén', 'Allright', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Almérinda', 'Dmytryk', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Intéressant', 'Cruise', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélinda', 'Boulde', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Örjan', 'Cockshoot', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Agnès', 'Stainton', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Séréna', 'Northway', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kù', 'Jaques', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gérald', 'Castagnasso', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Björn', 'Dowdall', 13);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélinda', 'Coombe', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Märta', 'Benit', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dà', 'Grennan', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Véronique', 'Chadwell', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mà', 'Ivashintsov', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Märta', 'Pidon', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Athéna', 'Clashe', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïlis', 'McCreery', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Budcock', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Märta', 'Bickardike', 45);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aimée', 'Coombs', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gaëlle', 'Paiton', 93);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Alizée', 'Carhart', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léone', 'Harnor', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méthode', 'Sotheron', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-noël', 'Boick', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélina', 'Reskelly', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléopatre', 'Kohnen', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-josée', 'Ife', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bénédicte', 'Featherstonehaugh', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Athéna', 'Koppke', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ruò', 'Dutteridge', 25);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Postians', 45);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Angélique', 'Newe', 67);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïly', 'Holyland', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clémentine', 'Lamberto', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlys', 'Christopher', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Félicie', 'Flaws', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Régine', 'Dorot', 67);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célestine', 'Nolton', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marlène', 'Espinazo', 37);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Danièle', 'Kirkham', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Crééz', 'Blacktin', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérénice', 'Colleford', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Josée', 'Cassin', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nuó', 'Gordon', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cunégonde', 'Tankin', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mégane', 'Wozencroft', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eléonore', 'Volk', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Camélia', 'Eicheler', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Inès', 'Sealey', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Céline', 'Kurtis', 93);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-josée', 'Fennelow', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïté', 'Mac Giany', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérangère', 'Forrest', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Vénus', 'LAbbet', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlla', 'Koeppke', 41);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lài', 'Boyles', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-ève', 'Verillo', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonie', 'Ollerton', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pò', 'Rickardes', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maï', 'Philo', 94);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëly', 'Pessel', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kévina', 'Cratchley', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Françoise', 'Lawless', 18);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eloïse', 'Pedroni', 56);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-ève', 'Lanchbury', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eugénie', 'Calverd', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ruò', 'Mathely', 91);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Danièle', 'Dyer', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Sòng', 'Willcock', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélys', 'Butteris', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Thérèsa', 'Cage', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pål', 'Fedoronko', 45);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-josée', 'Greswell', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marlène', 'Ownsworth', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Östen', 'Sealove', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Félicie', 'Joice', 37);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mégane', 'Prator', 96);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Géraldine', 'Bend', 43);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dorothée', 'Hanrott', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Valérie', 'Windridge', 66);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaël', 'Casotti', 23);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïly', 'Duggleby', 54);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Angélique', 'Puller', 56);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mégane', 'De Vere', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maï', 'Sumers', 12);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Réjane', 'Annets', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Thérèsa', 'Kleine', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Angélique', 'Applegarth', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bénédicte', 'Smowton', 71);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pélagie', 'Brosius', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maéna', 'Claesens', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Salomé', 'Briddock', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yénora', 'Hansel', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pélagie', 'Broadbere', 81);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Miléna', 'Rue', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stévina', 'Bromilow', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-hélène', 'Dunkerley', 91);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yè', 'Szymoni', 30);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zoé', 'Shaughnessy', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mylène', 'Lisimore', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stéphanie', 'Yakuntsov', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Northage', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Miléna', 'Learman', 64);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Faîtes', 'Lethibridge', 67);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Camélia', 'Murden', 56);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Félicie', 'Defries', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lyséa', 'Launchbury', 99);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noëlla', 'Winfrey', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Estée', 'Dagleas', 41);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gisèle', 'Merck', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Hélèna', 'Ortler', 52);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Desirée', 'Rockingham', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélia', 'Gittoes', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méng', 'Upward', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurélie', 'Jozefczak', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cloé', 'Bartoloma', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélinda', 'Wilkins', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dafnée', 'Lissemore', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Dempster', 92);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Véronique', 'Deport', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Danièle', 'Ravenscroftt', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Audréanne', 'Boshell', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gaïa', 'Bricket', 41);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mén', 'O'' Molan', 67);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Torbjörn', 'Tanti', 42);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Geneviève', 'Peirpoint', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Görel', 'Forward', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Josée', 'Linton', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pò', 'Marthen', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pò', 'Zeal', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Wá', 'Millwall', 96);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célia', 'Gabey', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Béatrice', 'Duckers', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Táng', 'Daton', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pélagie', 'Hobble', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Almérinda', 'Wards', 14);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Faîtes', 'Trussell', 30);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mén', 'Boag', 94);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Hélèna', 'Extall', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pål', 'Willson', 58);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lóng', 'Rustan', 96);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noémie', 'Volette', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaël', 'Howell', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dafnée', 'Rauprich', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Athéna', 'Tartt', 58);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lén', 'Ivancevic', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noémie', 'Littrik', 13);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaël', 'Pykett', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Daphnée', 'Recke', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Joséphine', 'Huegett', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Liè', 'Slark', 56);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurélie', 'Avrahamoff', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yénora', 'Malley', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Vérane', 'Lief', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Océane', 'Bautiste', 94);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Angèle', 'Dobbing', 42);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Océane', 'Louch', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïlis', 'Stoate', 91);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérénice', 'Cazereau', 45);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célestine', 'Golsworthy', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clélia', 'Mieville', 91);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stéphanie', 'Mellon', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noémie', 'Blight', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Garçon', 'Salzburg', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Océane', 'Tefft', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Erwéi', 'Boadby', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ráo', 'Kingcote', 27);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïwenn', 'Pocknell', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gérald', 'Tarry', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Östen', 'Gussin', 96);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zhì', 'Tilbrook', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léana', 'Tydd', 41);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célia', 'Lingner', 34);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélia', 'Le feuvre', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Liè', 'Giannassi', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Faîtes', 'Drewell', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Athéna', 'Grigorio', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marlène', 'Shelford', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léa', 'Cinderey', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ráo', 'Triggle', 92);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stévina', 'Chetter', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bécassine', 'Pauler', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Garçon', 'Larkkem', 93);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Jú', 'Sexten', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méryl', 'Cheesworth', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méryl', 'Yellowlea', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stévina', 'Magnus', 81);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Camélia', 'Koba', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Edmée', 'Dorrian', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gérald', 'Charle', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Néhémie', 'Potteridge', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yóu', 'Karby', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('André', 'Nattriss', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yénora', 'Maestro', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gaïa', 'Capeloff', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Faîtes', 'Cuel', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëly', 'Inkles', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noémie', 'Lampel', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-françoise', 'Shinfield', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Thérèsa', 'Mcsarry', 41);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-thérèse', 'Sidry', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andréa', 'De Gregoli', 83);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Erwéi', 'McCartney', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tán', 'Ballingal', 12);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Solène', 'Harp', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Simplifiés', 'Byars', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Annotés', 'Drews', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlann', 'Vanacci', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célia', 'Whitfield', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aimée', 'Hackley', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Miléna', 'Eade', 81);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eléa', 'Plak', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Naëlle', 'Bortolutti', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-thérèse', 'Manley', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Håkan', 'Robjohns', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adélaïde', 'Jore', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécile', 'Brettoner', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Annotée', 'Pickaver', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérénice', 'Cousins', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Örjan', 'Fuzzard', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Kliement', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lài', 'Mowlam', 33);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lóng', 'Pietasch', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Vénus', 'Houldey', 91);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Almérinda', 'Rawsthorne', 58);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlle', 'Ketchaside', 67);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Táng', 'Gregoretti', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adélie', 'Hale', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaé', 'Vlach', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lén', 'Mayward', 93);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Faîtes', 'Jacobsz', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Régine', 'Sperring', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Styrbjörn', 'Cotta', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lèi', 'Bateup', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gwenaëlle', 'Halsworth', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Táng', 'Belz', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Cuerda', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Erwéi', 'Wager', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélanie', 'Alfonsini', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Frédérique', 'Mumberson', 93);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-thérèse', 'Gabriel', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tán', 'Vany', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lyséa', 'Kovelmann', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonore', 'Almak', 58);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Médiamass', 'Skettles', 83);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléopatre', 'Espinha', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Sòng', 'Dohrmann', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécile', 'Mont', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-thérèse', 'Stuckes', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adélie', 'Gamon', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Intéressant', 'Videan', 29);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïc', 'Banaszkiewicz', 34);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pål', 'Sallan', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lauréna', 'Beccera', 99);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bécassine', 'Pearson', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Inès', 'Moresby', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Håkan', 'Rivelon', 83);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonie', 'Andrey', 72);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pål', 'McGrowther', 92);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Östen', 'Kebbell', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lorène', 'Corryer', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïs', 'Colaton', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-josée', 'Andriss', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Edmée', 'Hulbert', 52);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlys', 'Halpine', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pål', 'Ensten', 14);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maéna', 'Barrable', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noémie', 'Bowering', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Uò', 'Forster', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïly', 'Meads', 92);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaé', 'Arsnell', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïwenn', 'Dallan', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andréanne', 'Maleham', 81);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tán', 'Stowe', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélinda', 'Killingworth', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Örjan', 'Sercombe', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gisèle', 'Pleace', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Crééz', 'Dighton', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cloé', 'Jeandeau', 27);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Médiamass', 'Ineson', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zoé', 'Kydd', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Véronique', 'De Moreno', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Fèi', 'Duke', 25);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Céline', 'Moran', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëly', 'Cuss', 71);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélys', 'Kob', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Danièle', 'Kilcoyne', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Personnalisée', 'Node', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lèi', 'Persich', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cloé', 'Flear', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dafnée', 'Buckham', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélina', 'Blankhorn', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Åslög', 'McKay', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Fèi', 'Bottle', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Miléna', 'Crimmins', 58);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Almérinda', 'Orange', 23);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Håkan', 'Gwilliams', 64);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gaïa', 'Grief', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïca', 'Blandamore', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Kainz', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stéphanie', 'Kears', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ruò', 'Glavis', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adélie', 'Paton', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Esbjörn', 'Mee', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélia', 'Leddy', 64);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Åsa', 'Iddiens', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kù', 'Rens', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nélie', 'Rippingale', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yénora', 'Frigot', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mahélie', 'Treneer', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yè', 'MacKimm', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaëlle', 'Brown', 91);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clémentine', 'Philpault', 99);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clémence', 'Pinel', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlyss', 'Collingham', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Östen', 'Brody', 64);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécile', 'Rozet', 83);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célestine', 'Jennens', 29);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kallisté', 'Ledgeway', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célia', 'Winspear', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mén', 'Shannon', 29);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kallisté', 'Cokayne', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eliès', 'Nicolls', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andrée', 'Massie', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécilia', 'Dutnall', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlann', 'Petel', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nélie', 'Dolton', 71);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïlis', 'Reckus', 66);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-noël', 'Osmint', 64);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Félicie', 'Faughey', 72);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Liè', 'McDonand', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célia', 'Kimmitt', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ráo', 'Hoffman', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëline', 'Bottoms', 83);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëly', 'Mattiello', 71);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérengère', 'Christou', 17);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlyss', 'Dominy', 93);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaé', 'Mosdall', 67);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pélagie', 'Jarrad', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Michèle', 'Face', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kù', 'Lile', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kuí', 'Adamolli', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Jú', 'Renvoise', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Félicie', 'Slocom', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ophélie', 'Warbeys', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Illustrée', 'Dutteridge', 12);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaël', 'Davies', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Håkan', 'Arp', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eliès', 'Stennett', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Angèle', 'Graver', 29);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Audréanne', 'Dansie', 45);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Rachèle', 'Le Barre', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurélie', 'Sallis', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eugénie', 'Gandar', 58);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dorothée', 'Billsberry', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïs', 'Gifkins', 13);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Naéva', 'Goodliffe', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-thérèse', 'Dugood', 23);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlys', 'Reeve', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Blaymires', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noëlla', 'Lampitt', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaïs', 'De Anesy', 83);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pò', 'Seakes', 64);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Grotty', 45);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Séréna', 'Durbann', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marlène', 'Vickarman', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurène', 'Ohrt', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dorothée', 'Constanza', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Crééz', 'Gitting', 56);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kù', 'Harcarse', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Estève', 'De Carolis', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stévina', 'Gonsalvez', 99);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Wá', 'Pickerill', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Uò', 'Sommerfeld', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérangère', 'Teeney', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Styrbjörn', 'O'' Concannon', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Åke', 'Calvie', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëline', 'Carrel', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célia', 'Targe', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélissandre', 'Hatley', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yóu', 'Edwick', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clémentine', 'Firmager', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélia', 'Johanning', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gwenaëlle', 'Breslin', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonie', 'Aubri', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Angèle', 'Slayford', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Renée', 'Covotti', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nélie', 'Stoke', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Måns', 'Zannini', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurène', 'Cornels', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélodie', 'Hatchman', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Céline', 'Huson', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïwenn', 'Gunthorpe', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Régine', 'McShane', 58);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aurélie', 'Treverton', 18);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eléa', 'Arter', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kévina', 'Diplock', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Åsa', 'Beneteau', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Angèle', 'Jamison', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Thérèsa', 'Connichie', 92);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Sélène', 'Dziwisz', 27);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lén', 'Snasdell', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Michèle', 'Chucks', 33);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dà', 'Colgan', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Görel', 'Redmain', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mahélie', 'Moncaster', 41);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïté', 'Lunam', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Amélie', 'Abbison', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yè', 'Thiem', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andrée', 'Dunnett', 17);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Françoise', 'Gaynor', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurélie', 'Ellen', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Vérane', 'Faraker', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-françoise', 'Woodyatt', 34);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dù', 'Clemont', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Börje', 'Farnon', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léane', 'McCarver', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maï', 'Trippick', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Céline', 'Bamb', 43);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aloïs', 'O''Flaherty', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurélie', 'Woodeson', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Uò', 'Trinder', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tán', 'Lindro', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adèle', 'Devanney', 12);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Néhémie', 'Knoles', 13);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonore', 'Chazier', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélissandre', 'Charter', 34);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Réjane', 'Myrick', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Audréanne', 'Antoinet', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clélia', 'Sanchiz', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Angèle', 'Bellwood', 45);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérengère', 'Samweyes', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Véronique', 'Kitching', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Åsa', 'Rosenau', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Réservés', 'Hully', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méghane', 'Woolatt', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Chloé', 'Anand', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célestine', 'Leuren', 43);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cloé', 'McPherson', 66);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léa', 'Connichie', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Almérinda', 'Cleyne', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gérald', 'Jencken', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mahélie', 'Brumfield', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Hélène', 'Twining', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïlis', 'Heavy', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kévina', 'Alder', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mén', 'Ubsdall', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Wá', 'Beadman', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Joséphine', 'Garrat', 93);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Séverine', 'Purvess', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Océanne', 'Danbrook', 72);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kévina', 'Peddie', 42);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Géraldine', 'Stadden', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Sélène', 'Itzig', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélodie', 'Laurent', 17);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nuó', 'Langeren', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Séréna', 'Dunbobin', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gaïa', 'Cocksedge', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Faîtes', 'Wrighton', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Géraldine', 'Coburn', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécile', 'Trappe', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Vérane', 'Teague', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Annotée', 'Chestnutt', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lauréna', 'Walkey', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Torbjörn', 'Gann', 72);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Håkan', 'Ivanusyev', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécile', 'McMychem', 91);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Östen', 'Hanshawe', 43);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Céline', 'Baskett', 33);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Camélia', 'Wandrey', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stévina', 'Matresse', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yénora', 'Molan', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yè', 'Dyer', 14);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonie', 'Ferrieres', 94);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lyséa', 'Shimmings', 52);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Yè', 'Kinton', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Börje', 'Owen', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andréa', 'Rawls', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Illustrée', 'Cook', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clélia', 'Morby', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Sòng', 'Smallacombe', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kallisté', 'Vamplus', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Görel', 'Aris', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Michèle', 'Herculson', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célia', 'Edland', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Joséphine', 'Lapthorne', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Miléna', 'Rowling', 13);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Styrbjörn', 'Fotitt', 71);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécile', 'McKea', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléopatre', 'Fuzzey', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lucrèce', 'Drable', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aimée', 'Brameld', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Publicité', 'Gudgen', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kévina', 'Oldknowe', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Renée', 'Catford', 13);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Michèle', 'Siflet', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Frédérique', 'Gieves', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Esbjörn', 'Jochen', 13);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Desirée', 'Bilsford', 55);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noémie', 'Dacre', 41);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stéphanie', 'Christofle', 30);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélinda', 'O''Dyvoie', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Judicaël', 'Ramble', 26);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marlène', 'Leyson', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nuó', 'Machans', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laïla', 'Mityushin', 81);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Garçon', 'Derbyshire', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Garçon', 'De Winton', 37);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurélie', 'Fibbitts', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Salomé', 'Tranter', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonie', 'Batalini', 94);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Athéna', 'Whiteside', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gérald', 'Tocknell', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Magdalène', 'Rizzetti', 47);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélys', 'Ambrois', 84);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélissandre', 'Eckersley', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Estève', 'Winspeare', 17);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-noël', 'Mandeville', 83);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ophélie', 'Osinin', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Camélia', 'Davitt', 25);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Frédérique', 'Blaker', 72);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bérengère', 'Ewing', 66);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gisèle', 'Sacaze', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aí', 'Whale', 96);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Thérèse', 'Whittenbury', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Béatrice', 'Annett', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Håkan', 'Gaine', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cloé', 'Kinastan', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaé', 'Rubra', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Annotés', 'Skellion', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Torbjörn', 'Pigram', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Salomé', 'McGonigal', 54);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aí', 'Mathwin', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Desirée', 'Bamlet', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Uò', 'Dominik', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Vérane', 'Wanka', 42);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Pélagie', 'Crees', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Andrée', 'Astles', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-thérèse', 'Mepsted', 46);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Séverine', 'Struther', 44);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélina', 'Pile', 76);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlyss', 'Thurlbourne', 30);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïlys', 'Liff', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Börje', 'Rohmer', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Wá', 'Crewther', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Véronique', 'Di Gregorio', 37);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maéna', 'Twidale', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Crééz', 'Gallehock', 28);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïc', 'Ellar', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Véronique', 'Cundy', 29);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Wá', 'Kryszka', 35);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-noël', 'Twist', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zhì', 'Heintzsch', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlann', 'Wem', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tán', 'Evitt', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Salomé', 'Eloi', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléopatre', 'Baldrick', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Edmée', 'McComiskie', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léa', 'Laminman', 34);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-hélène', 'Daventry', 23);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Réservés', 'Stiffell', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonore', 'Katzmann', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Almérinda', 'Look', 94);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méryl', 'BoHlingolsen', 52);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Céline', 'Dutteridge', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Åsa', 'Sorbie', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélodie', 'Joye', 64);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Annotés', 'Peer', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léonore', 'Antoinet', 54);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Miléna', 'McLevie', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëly', 'Wardlow', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Camélia', 'MacCosty', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëline', 'Pena', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bénédicte', 'Lintin', 54);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaëlle', 'Cardis', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Göran', 'Goare', 41);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Simplifiés', 'Illidge', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laïla', 'Woosnam', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gaëlle', 'Outright', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kévina', 'Druce', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Nélie', 'Bell', 27);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dà', 'Bowich', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Personnalisée', 'Corryer', 79);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Demangeot', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léa', 'Conley', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaël', 'Dougan', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Irène', 'Baume', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlyss', 'Langshaw', 98);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léana', 'Mogey', 50);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Erwéi', 'Ruffy', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Styrbjörn', 'Reina', 71);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clélia', 'Haggart', 83);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laïla', 'Nussii', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aurélie', 'Wabersinke', 23);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécilia', 'Nabarro', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('André', 'Syversen', 92);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Wá', 'Smeuin', 36);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mà', 'Guildford', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Solène', 'Wiper', 53);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Thérèsa', 'Machel', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélys', 'Fibbens', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maéna', 'Cadwaladr', 52);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maéna', 'Jellico', 61);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélodie', 'De Gogay', 74);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léone', 'Gilbee', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lài', 'Sheehan', 19);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gwenaëlle', 'Cookson', 30);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Rébecca', 'Lyfield', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léane', 'Dovidaitis', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eliès', 'Bateup', 45);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Kassman', 85);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kù', 'Trimbey', 87);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aloïs', 'Caughan', 77);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léandre', 'Devereux', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Bénédicte', 'Castree', 15);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Stévina', 'Petrussi', 39);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Björn', 'Eddow', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Adèle', 'Longden', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurène', 'Clousley', 92);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Táng', 'Kaspar', 49);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlann', 'Boocock', 63);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marylène', 'Yandell', 72);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Annotée', 'Filyashin', 21);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Marie-thérèse', 'Tudball', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Régine', 'Game', 48);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Eugénie', 'Broske', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Célestine', 'Rontree', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Clémence', 'Orehead', 80);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Séverine', 'Ridgeway', 38);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Loïca', 'Seint', 20);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Agnès', 'Nyland', 100);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Aí', 'Niche', 43);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Estée', 'Costelow', 65);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Françoise', 'McClinton', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Tán', 'Glandfield', 60);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélina', 'Bourne', 73);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lóng', 'Wonter', 82);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Méryl', 'Ugoletti', 72);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Kù', 'Edgworth', 17);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïté', 'Abella', 88);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Sòng', 'Sargant', 69);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Crééz', 'Pikesley', 59);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Léana', 'Timbs', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Ruò', 'Heggs', 95);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécilia', 'Thatcham', 81);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Desirée', 'Mills', 57);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Gaétane', 'Seyfart', 62);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Geneviève', 'Ohrtmann', 70);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cécile', 'Mountney', 18);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maëlyss', 'Samsworth', 23);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lucrèce', 'Matyja', 24);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noëlla', 'MacDonald', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Noémie', 'Mawer', 25);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Lidgerton', 97);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Laurène', 'Fell', 68);" ,
-                    "insert into DPerea (david, apellido, edad) values ('André', 'Lawry', 16);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mén', 'Wooldridge', 56);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mégane', 'Atchly', 51);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Naéva', 'Yelden', 94);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dà', 'Zincke', 75);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Lài', 'McConigal', 90);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Anaël', 'Arnett', 32);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Dà', 'Ygo', 40);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Zhì', 'Crichten', 22);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maïly', 'Lackemann', 31);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Cléa', 'Petschelt', 89);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Geneviève', 'Veitch', 86);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Mélanie', 'Foukx', 78);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Maï', 'Plover', 33);" ,
-                    "insert into DPerea (david, apellido, edad) values ('Danièle', 'Hannaway', 97);"};
+            while (sc.hasNext()){
+                dato=sc.nextLine();
 
+                smtl.executeUpdate(dato);
 
-
-            for(int i =0; i<insertarDatos.length;i++){
-                smtl.executeUpdate(insertarDatos[i]);
             }
+
            
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
 
@@ -1073,7 +180,7 @@ public class Main {
                     System.out.print("ID " + resultSet.getString("ID"));
                 }
 
-                if(hasColumn(resultSet,"david")){
+                if(hasColumn(resultSet,"nombre")){
                     System.out.print(", Nombre " + resultSet.getString("david"));
                 }
                 if(hasColumn(resultSet,"apellido") ){
@@ -1091,6 +198,86 @@ public class Main {
 
     }
 
+
+
+    /*
+    public static void recorrerNombresPorLetra (Connection con){
+        Scanner sc = new Scanner(System.in);
+
+        String a = sc.nextLine() ;
+
+
+        ResultSet resultSet=null;
+        try {
+            PreparedStatement pstmt = con.prepareStatement("select * from DPerea where david like ? ORDER BY apellido");
+
+            pstmt.setString(1,a+'%');
+
+            resultSet = pstmt.executeQuery();
+
+            while(resultSet.next()){
+
+                if(hasColumn(resultSet,"ID")){
+                    System.out.print("ID " + resultSet.getString("ID"));
+                }
+
+                if(hasColumn(resultSet,"david")){
+                    System.out.print(", Nombre " + resultSet.getString("david"));
+                }
+                if(hasColumn(resultSet,"apellido") ){
+                    System.out.print(", Apellido " + resultSet.getString("apellido"));
+                }
+                if(hasColumn(resultSet,"edad")){
+                    System.out.println(", Edad " + resultSet.getInt("edad"));
+                }
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+*/
+
+    /*
+    public static void recorrerEjercicio5 (Connection con){
+        Scanner sc = new Scanner(System.in);
+
+        String a = sc.nextLine() ;
+        String b = sc.nextLine() ;
+
+        ResultSet resultSet=null;
+        try {
+            PreparedStatement pstmt = con.prepareStatement("select * from DPerea where nombre like ? AND apellido LIKE ? ORDER BY apellido");
+
+            pstmt.setString(1,a+'%');
+            pstmt.setString(2,b+'%');
+            resultSet = pstmt.executeQuery();
+
+            while(resultSet.next()){
+
+                if(hasColumn(resultSet,"ID")){
+                    System.out.print("ID " + resultSet.getString("ID"));
+                }
+
+                if(hasColumn(resultSet,"david")){
+                    System.out.print(", Nombre " + resultSet.getString("david"));
+                }
+                if(hasColumn(resultSet,"apellido") ){
+                    System.out.print(", Apellido " + resultSet.getString("apellido"));
+                }
+                if(hasColumn(resultSet,"edad")){
+                    System.out.println(", Edad " + resultSet.getInt("edad"));
+                }
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }*/
 
 
 
