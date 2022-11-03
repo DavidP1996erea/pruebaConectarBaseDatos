@@ -41,7 +41,9 @@ public class Main {
             insertarDatos(con, new File("Games.sql"));
             insertarDatos(con, new File("Compras.sql"));
 
-
+           // mostrarDatosPlayer(con,"Select * from Player");
+           // mostrarDatosGames(con, "Select * from Games");
+            mostrarDatosCompras(con,"Select * from Compras" );
             // addColum(con);
             // insertarDato(con);
             // Ejercicio1: "Select * FROM  DPerea ORDER BY edad"
@@ -170,30 +172,29 @@ public class Main {
         }
         return false;
     }
-    public static void mostrarDatos(Connection con, String sql){
+    public static void mostrarDatosPlayer(Connection con, String sql){
 
         Statement smtl = null;
         ResultSet resultSet=null;
         try {
-
 
             smtl = con.createStatement();
             resultSet = smtl.executeQuery(sql);
 
             while(resultSet.next()){
 
-                if(hasColumn(resultSet,"ID")){
-                    System.out.print("ID " + resultSet.getString("ID"));
+                if(hasColumn(resultSet,"ID_Player")){
+                    System.out.print("ID_Player " + resultSet.getString("ID_Player"));
                 }
 
-                if(hasColumn(resultSet,"nombre")){
-                    System.out.print(", Nombre " + resultSet.getString("david"));
+                if(hasColumn(resultSet,"Nick")){
+                    System.out.print(", Nick " + resultSet.getString("Nick"));
                 }
-                if(hasColumn(resultSet,"apellido") ){
-                    System.out.print(", Apellido " + resultSet.getString("apellido"));
+                if(hasColumn(resultSet,"password") ){
+                    System.out.print(", password " + resultSet.getString("password"));
                 }
-                if(hasColumn(resultSet,"edad")){
-                    System.out.println(", Edad " + resultSet.getInt("edad"));
+                if(hasColumn(resultSet,"email")){
+                    System.out.println(", email " + resultSet.getString("email"));
                 }
                 System.out.println();
             }
@@ -204,8 +205,77 @@ public class Main {
 
     }
 
+    public static void mostrarDatosGames(Connection con, String sql){
+
+        Statement smtl = null;
+        ResultSet resultSet=null;
+        try {
+
+            smtl = con.createStatement();
+            resultSet = smtl.executeQuery(sql);
+
+            while(resultSet.next()){
+
+                if(hasColumn(resultSet,"ID_Games")){
+                    System.out.print("ID_Games " + resultSet.getString("ID_Games"));
+                }
+
+                if(hasColumn(resultSet,"nombre")){
+                    System.out.print(", nombre " + resultSet.getString("nombre"));
+                }
+                if(hasColumn(resultSet,"tiempoJugado") ){
+                    System.out.print(", tiempoJugado " + resultSet.getString("tiempoJugado"));
+                }
+
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 
+    public static void mostrarDatosCompras(Connection con, String sql){
+
+        Statement smtl = null;
+        ResultSet resultSet=null;
+        try {
+
+            smtl = con.createStatement();
+            resultSet = smtl.executeQuery(sql);
+
+            while(resultSet.next()){
+
+                if(hasColumn(resultSet,"ID_Compra")){
+                    System.out.print("ID_Compra " + resultSet.getString("ID_Compra"));
+                }
+
+                if(hasColumn(resultSet,"ID_Player")){
+                    System.out.print(", ID_Player " + resultSet.getString("ID_Player"));
+                }
+                if(hasColumn(resultSet,"ID_Games") ){
+                    System.out.print(", ID_Games " + resultSet.getString("ID_Games"));
+                }
+                if(hasColumn(resultSet,"cosa")){
+                    System.out.print(", cosa " + resultSet.getString("cosa"));
+                }
+                if(hasColumn(resultSet,"precio") ){
+                    System.out.print(", precio " + resultSet.getDouble("precio"));
+                }
+                if(hasColumn(resultSet,"fechaCompra") ){
+                    System.out.print(", fechaCompra " + resultSet.getDate("fechaCompra"));
+                }
+
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
     /*
     public static void recorrerNombresPorLetra (Connection con){
         Scanner sc = new Scanner(System.in);
