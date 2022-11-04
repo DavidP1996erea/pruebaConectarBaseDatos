@@ -19,6 +19,8 @@ public class Main {
 
 
             usarDatabase(con);
+            Scanner sc = new Scanner(System.in);
+
 
             borrarTabla(con,"Compras");
             borrarTabla(con,"Player");
@@ -32,7 +34,7 @@ public class Main {
                     "tiempoJugado TIME," + "PRIMARY KEY (ID_Games))");
 
 
-           crearTabla(con, "CREATE TABLE IF NOT EXISTS Compras" + "(ID_Compra INTEGER AUTO_INCREMENT," + "ID_Player INTEGER," +
+            crearTabla(con, "CREATE TABLE IF NOT EXISTS Compras" + "(ID_Compra INTEGER AUTO_INCREMENT," + "ID_Player INTEGER," +
                     "ID_Games INTEGER,"+ "cosa VARCHAR(25)," +"precio DECIMAL(6,2),"+ "fechaCompra DATE,"
                     + "PRIMARY KEY (ID_Compra)," + "FOREIGN KEY (ID_Player) REFERENCES Player(ID_Player)," +"FOREIGN KEY (ID_Games) REFERENCES Games(ID_Games))" );
 
@@ -40,10 +42,6 @@ public class Main {
             insertarDatos(con, new File("Player.sql"));
             insertarDatos(con, new File("Games.sql"));
             insertarDatos(con, new File("Compras.sql"));
-
-           // mostrarDatosPlayer(con,"Select * from Player");
-           // mostrarDatosGames(con, "Select * from Games");
-            mostrarDatosCompras(con,"Select * from Compras" );
             // addColum(con);
             // insertarDato(con);
             // Ejercicio1: "Select * FROM  DPerea ORDER BY edad"
@@ -57,6 +55,75 @@ public class Main {
             // Ejercicio9: "Select * from DPerea where edad >65"
             // Ejercicio10: addColum()
             // mostrarDatos(con,"UPDATE DPerea set laboral = estudiantes where edad<18 ") ;
+
+            int opcion;
+
+            elegirOpcion();
+            opcion = sc.nextInt();
+            while (opcion!=0){
+
+
+                switch (opcion){
+
+                    case 1:
+                        Scanner scCrear = new Scanner(System.in);
+                        String sql="";
+                        System.out.println("Introduzca el código sql para crear la tabla");
+                        sql=scCrear.nextLine();
+                        crearTabla(con, sql);
+                        break;
+
+                    case 2:
+                        Scanner scInsert = new Scanner(System.in);
+                        String fichero;
+
+                        System.out.println("Introduzca el fichero con los datos (también la extensión)");
+                        fichero=scInsert.nextLine();
+
+                        insertarDatos(con, new File(fichero));
+
+                        break;
+
+                    case 3:
+                        Scanner scDelete = new Scanner(System.in);
+                        String nombreTabla;
+                        System.out.println("Introduzca el nombre de la tabla que desea borrar");
+                        nombreTabla=scDelete.nextLine();
+
+                        borrarTabla(con,nombreTabla);
+
+                        break;
+
+                    case 4:
+
+                        Scanner scSelect = new Scanner(System.in);
+                        String nombreTablaSelect;
+                        System.out.println("Introduzca el nombre de la tabla que desea mostrar los datos");
+                        nombreTablaSelect=scSelect.nextLine();
+
+
+                        if(nombreTablaSelect.equals("Compras")){
+                            mostrarDatosCompras(con, "Select * from Compras");
+                        }else if(nombreTablaSelect.equals("Games")){
+                            mostrarDatosGames(con, "Select * from Games");
+                        }else if(nombreTablaSelect.equals("Player")){
+                            mostrarDatosPlayer(con, "Select * from Player");
+                        }else{
+                            System.out.println("Esta tabla no existe");
+                        }
+
+
+
+                        break;
+
+                    default:
+                        System.out.println("Opción incorrecta");
+                        break;
+                }
+                elegirOpcion();
+                opcion = sc.nextInt();
+
+            }
 
 
         } catch (ClassNotFoundException e) {
@@ -274,6 +341,21 @@ public class Main {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+
+    }
+
+
+    public static  void elegirOpcion(){
+
+
+        System.out.println("Introduzca una opcíon: ");
+        System.out.println("1. Crear tabla");
+        System.out.println("2. Insertar datos en tabla");
+        System.out.println("3. Borrar tabla");
+        System.out.println("4. Mostrar datos de una tabla");
+        System.out.println("0. Salir");
+
 
     }
     /*
